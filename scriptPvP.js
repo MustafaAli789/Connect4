@@ -58,7 +58,7 @@ function getColumn(x){
 		return {x: 385, column: 5};
 	} else if(420<x && x<490){
 		return {x: 455, column: 6};
-	} else {return null;}
+	} else {return {column: null};}
 }
 
 function clearTopRow(){
@@ -95,6 +95,23 @@ function addCircleToColumn(columnNum){
 	return -1;
 }
 
+//takes a row and column and checks to direction as specified by dir (if 1, then bottom right, if -1 then bottom left)
+function verifyDiagonal(rowStart, columnStart, direction){
+	let row = rowStart;
+	let column = columnStart;
+	for(var i = 0; i<4; i++){
+		if(grid[row][column]!=turn){
+			return false;
+		}else{row+=1; column+=(1*direction)}
+	}
+	return true;
+}
+
+//return an object with following data
+//win - boolean to represent if won
+//column - column from which last check was made
+//row - row from which last check was made
+//direction - the type of check (1 - horizontal right, 2 - vertical down, 3 - diagonal bottom left, 4 - diagonal bottom right)
 function verifyWin(){
 
 	let win = true;
@@ -106,7 +123,7 @@ function verifyWin(){
 			for(var k =j; k<j+4;k++){ //looping through each column in set o 4
 				if(grid[i][k]!=turn){win=false; break;}
 			}
-			if(win){return win;}
+			if(win){return {win: win, column: k, row: i, direction: 1};}
 		}
 	}
 
@@ -118,7 +135,23 @@ function verifyWin(){
 			for(var k =j; k<j+4;k++){ //looping through each row in the set of 4
 				if(grid[k][i]!=turn){win=false; break;}
 			}
-			if(win){return win;}
+			if(win){return {win: win, column: i, row: k, direction: 2};}
+		}
+	}
+
+	//checking all diagonals to bottom left
+	for(var i = 3; i<7; i++){
+		for(var j = 0; j<4; j++){
+			win = verifyDiagonal(j, i, -1);
+			if(win){return {win: win, column: i, row: j, direction: 3};}
+		}
+	}
+
+	//checking all diagonals to bottom right
+	for(var i = 0; i<4; i++){
+		for(var j = 0; j<4; j++){
+			win = verifyDiagonal(j, i, 1);
+			if(win){return {win: win, column: i, row: j, direction: 4};}
 		}
 	}
 
@@ -132,7 +165,7 @@ canvas.addEventListener("click", (event)=>{
 	let rowNum = addCircleToColumn(columnNum);
 	if(rowNum!=-1){
 		drawCircleInColumn(rowNum, columnNum);
-		console.log(verifyWin(rowNum, columnNum));
+		console.log(verifyWin(rowNum, columnNum).win);
 		if(turn==="red"){
 			turn="green";
 		}else{turn="red";}
