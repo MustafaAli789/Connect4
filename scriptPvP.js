@@ -76,23 +76,31 @@ window.addEventListener("mousemove", (event)=>{
 	showCircleAboveGrid(x);
 });
 
-function drawCircleInColumn(row, columnNum){
-	let y = row*70+75;
-	let x = columnNum*70+35;
+//draws the circle on the board at the specified position
+function drawCircleInColumn(rowNum, columnNum){
+	let x = getCenterCoords(rowNum, columnNum).x;
+	let y = getCenterCoords(rowNum, columnNum).y;
 	drawCircle(x, y, 35, turn);
+}
+
+//will verify if column is full or not
+function isValidColumn(columnNum){
+	for(var i = 6; i>=0; i--){
+		if(grid[i][columnNum]===0){
+			return {valid: true, row: i};
+		}
+	}
+	return {valid: false, row: null}; //return no row if not valid column
 }
 
 //will update the grid array and return the index if the column is valid
 function addCircleToColumn(columnNum){
-	let validSpot = false;
 	for(var i = 6; i>=0; i--){
 		if(grid[i][columnNum]===0){
 			grid[i][columnNum]=turn;
-			validSpot = true;
-			return i;
+			break;
 		}
 	}
-	return -1;
 }
 
 //takes a row and column and checks to direction as specified by dir (if 1, then bottom right, if -1 then bottom left)
@@ -123,7 +131,7 @@ function verifyWin(){
 			for(var k =j; k<j+4;k++){ //looping through each column in set o 4
 				if(grid[i][k]!=turn){win=false; break;}
 			}
-			if(win){return {win: win, column: k, row: i, direction: 1};}
+			if(win){return {win: win, column: k-4, row: i, direction: 1};}
 		}
 	}
 
@@ -135,7 +143,8 @@ function verifyWin(){
 			for(var k =j; k<j+4;k++){ //looping through each row in the set of 4
 				if(grid[k][i]!=turn){win=false; break;}
 			}
-			if(win){return {win: win, column: i, row: k, direction: 2};}
+			if(win){
+				return {win: win, column: i, row: k-4, direction: 2};}
 		}
 	}
 
@@ -143,7 +152,8 @@ function verifyWin(){
 	for(var i = 3; i<7; i++){
 		for(var j = 0; j<4; j++){
 			win = verifyDiagonal(j, i, -1);
-			if(win){return {win: win, column: i, row: j, direction: 3};}
+			if(win){
+				return {win: win, column: i, row: j, direction: 3};}
 		}
 	}
 
@@ -159,18 +169,53 @@ function verifyWin(){
 
 }
 
+//returns an object storing the x and y pos at the center of the row, column for drawing purposes
+function getCenterCoords(rowNum, columnNum){
+		return {y: rowNum*70+75, x: columnNum*70+35};
+}
+
+//will draw a line over the winning set of circles
+function drawWin(rowEnd, columnEnd, direction){
+	debugger;
+	let xStart = getCenterCoords(rowEnd, columnEnd).x;
+	let yStart = getCenterCoords(rowEnd, columnEnd).y;
+	ctx.beginPath();
+	ctx.moveTo(xStart, yStart);
+	switch(direction){
+		case 1: 
+			ctx.lineTo(xStart+4*70, yStart); //horizontal right win
+			break;
+		case 2:
+			ctx.lineTo(xStart, yStart+3*70); //vertical down win
+			break;
+		case 3:
+			ctx.lineTo(xStart-4*70, yStart+4*70); //bottom left win
+			break;
+		case 4:
+			ctx.lineTo(xStart+4*70, yStart+4*70); //bottom right win
+			break;
+	}
+	ctx.stroke();
+	ctx.closePath();
+}
+
 //handles clicking
 canvas.addEventListener("click", (event)=>{
 	let columnNum = getColumn(getMouseXCoorRelativeToCanvas(event)).column;
-	let rowNum = addCircleToColumn(columnNum);
-	if(rowNum!=-1){
+	if(isValidColumn(columnNum).valid){
+		let rowNum = isValidColumn(columnNum).row;
+		addCircleToColumn(columnNum); 
 		drawCircleInColumn(rowNum, columnNum);
-		console.log(verifyWin(rowNum, columnNum).win);
-		if(turn==="red"){
-			turn="green";
-		}else{turn="red";}
-		clearTopRow();
-		showCircleAboveGrid(columnNum*70+35);
+		if(verifyWin(rowNum, columnNum).win){
+			let winObj = verifyWin(rowNum, columnNum);
+			drawWin(winObj.row, winObj.column, winObj.direction)
+		} else{
+			if(turn==="red"){
+				turn="green";
+			}else{turn="red";}
+			clearTopRow();
+			showCircleAboveGrid(getCenterCoords(rowNum, columnNum).x);
+		}
 	}
 	
 
