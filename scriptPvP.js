@@ -1,3 +1,5 @@
+//Initializing Variables and Constants
+
 const canvas = document.querySelector("#board");
 const ctx = canvas.getContext("2d");
 const gridSize = 70;
@@ -10,36 +12,17 @@ let grid = [[0, 0, 0, 0, 0, 0, 0],
 			[0, 0, 0, 0, 0, 0, 0], 
 			[0, 0, 0, 0, 0, 0, 0]];
 
-window.addEventListener("load", ()=>{
-	canvas.width = 490;
-	canvas.height = 530;
-	ctx.setLineDash([5, 3]);
-	drawGrid();
-});
 
-function drawGrid(){
-	for(var i =0; i<7; i++){
-		for(var j = 0; j<7; j++){
-			ctx.strokeRect(j*gridSize, i*gridSize+40, gridSize, gridSize);
-		}
-	}
-}
 
-function drawCircle(x, y, radius, color){
-	ctx.setLineDash([1,0]);
-	ctx.beginPath();
-	ctx.arc(x, y, radius, 0, 2 * Math.PI);
-	ctx.fillStyle = color;
-	ctx.fill();
-}
 
-//will show the circle when hovering at the top 
-function showCircleAboveGrid(x){
-	let xCoor = getColumn(x);
-	clearTopRow();
-	if(xCoor!=null){
-		drawCircle(xCoor.x, 20, 20, turn); //color is stored in turn name
-	}
+
+//------------------------------------------Helper Methods START----------------------------------//
+
+//gets the mouse x relative to the canvas
+function getMouseXCoorRelativeToCanvas(){
+	var rect = canvas.getBoundingClientRect();
+	let x = event.clientX - rect.left;
+	return x;
 }
 
 //takes an x coordinate relative to the canvas and returns center + column num 
@@ -61,20 +44,62 @@ function getColumn(x){
 	} else {return {column: null};}
 }
 
+//returns an object storing the x and y pos at the center of the row, column for drawing purposes
+function getCenterCoords(rowNum, columnNum){
+		return {y: rowNum*70+75, x: columnNum*70+35};
+}
+//-------------------------------------------Helper Methods END----------------------------------//
+
+
+
+
+
+//--------------------------------------Drawing Related Methods START----------------------------//
+function drawGrid(){
+	for(var i =0; i<7; i++){
+		for(var j = 0; j<7; j++){
+			ctx.strokeRect(j*gridSize, i*gridSize+40, gridSize, gridSize);
+		}
+	}
+}
+
+//clears the top row where the circle is displayed before clicking
 function clearTopRow(){
 	ctx.clearRect(0, 0, canvas.width, 40);
 }
 
-function getMouseXCoorRelativeToCanvas(){
-	var rect = canvas.getBoundingClientRect();
-	let x = event.clientX - rect.left;
-	return x;
+//draws a circle based on specific criteria
+function drawCircle(x, y, radius, color){
+	ctx.setLineDash([1,0]);
+	ctx.beginPath();
+	ctx.arc(x, y, radius, 0, 2 * Math.PI);
+	ctx.fillStyle = color;
+	ctx.fill();
 }
 
-window.addEventListener("mousemove", (event)=>{
-	let x = getMouseXCoorRelativeToCanvas(event);
-	showCircleAboveGrid(x);
-});
+//will draw a line over the winning set of circles
+function drawWin(rowEnd, columnEnd, direction){
+	let xStart = getCenterCoords(rowEnd, columnEnd).x;
+	let yStart = getCenterCoords(rowEnd, columnEnd).y;
+	ctx.beginPath();
+	ctx.moveTo(xStart, yStart);
+	switch(direction){
+		case 1: 
+			ctx.lineTo(xStart+3*70, yStart); //horizontal right win
+			break;
+		case 2:
+			ctx.lineTo(xStart, yStart+3*70); //vertical down win
+			break;
+		case 3:
+			ctx.lineTo(xStart-3*70, yStart+3*70); //bottom left win
+			break;
+		case 4:
+			ctx.lineTo(xStart+3*70, yStart+3*70); //bottom right win
+			break;
+	}
+	ctx.stroke();
+	ctx.closePath();
+}
 
 //draws the circle on the board at the specified position
 function drawCircleInColumn(rowNum, columnNum){
@@ -82,6 +107,24 @@ function drawCircleInColumn(rowNum, columnNum){
 	let y = getCenterCoords(rowNum, columnNum).y;
 	drawCircle(x, y, 35, turn);
 }
+
+//will show the circle when hovering at the top 
+function showCircleAboveGrid(x){
+	let xCoor = getColumn(x);
+	clearTopRow();
+	if(xCoor!=null){
+		drawCircle(xCoor.x, 20, 20, turn); //color is stored in turn name
+	}
+}
+
+//--------------------------------------Drawing Related Methods END----------------------------//
+
+
+
+
+
+//-----------------------------------Logic and Funcional Methods START------------------------//
+
 
 //will verify if column is full or not
 function isValidColumn(columnNum){
@@ -168,36 +211,24 @@ function verifyWin(){
 	return false;
 
 }
+//-----------------------------------Logic and Funcional Methods END------------------------//
 
-//returns an object storing the x and y pos at the center of the row, column for drawing purposes
-function getCenterCoords(rowNum, columnNum){
-		return {y: rowNum*70+75, x: columnNum*70+35};
-}
 
-//will draw a line over the winning set of circles
-function drawWin(rowEnd, columnEnd, direction){
-	debugger;
-	let xStart = getCenterCoords(rowEnd, columnEnd).x;
-	let yStart = getCenterCoords(rowEnd, columnEnd).y;
-	ctx.beginPath();
-	ctx.moveTo(xStart, yStart);
-	switch(direction){
-		case 1: 
-			ctx.lineTo(xStart+4*70, yStart); //horizontal right win
-			break;
-		case 2:
-			ctx.lineTo(xStart, yStart+3*70); //vertical down win
-			break;
-		case 3:
-			ctx.lineTo(xStart-4*70, yStart+4*70); //bottom left win
-			break;
-		case 4:
-			ctx.lineTo(xStart+4*70, yStart+4*70); //bottom right win
-			break;
-	}
-	ctx.stroke();
-	ctx.closePath();
-}
+
+
+//-------------------------------------------------MAIN-------------------------------------//
+
+window.addEventListener("load", ()=>{
+	canvas.width = 490;
+	canvas.height = 530;
+	ctx.setLineDash([5, 3]);
+	drawGrid();
+});
+
+window.addEventListener("mousemove", (event)=>{
+	let x = getMouseXCoorRelativeToCanvas(event);
+	showCircleAboveGrid(x);
+});
 
 //handles clicking
 canvas.addEventListener("click", (event)=>{
@@ -217,12 +248,8 @@ canvas.addEventListener("click", (event)=>{
 			showCircleAboveGrid(getCenterCoords(rowNum, columnNum).x);
 		}
 	}
-	
-
-
 });
 
-//setInterval(draw,1000/15);
 
 
 
