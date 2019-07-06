@@ -72,13 +72,8 @@ function getMouseXCoorRelativeToCanvas(){
 }
 
 window.addEventListener("mousemove", (event)=>{
-
-	var rect = canvas.getBoundingClientRect();
-	let y = event.clientY - rect.top;
-
 	let x = getMouseXCoorRelativeToCanvas(event);
 	showCircleAboveGrid(x);
-	console.log(y);
 });
 
 function drawCircleInColumn(row, columnNum){
@@ -100,7 +95,34 @@ function addCircleToColumn(columnNum){
 	return -1;
 }
 
-function verifyWin(lastRow, lastColumn){
+function verifyWin(){
+
+	let win = true;
+
+	//checking each horizontal row
+	for(var i = 0; i<7; i++){ //looping through rows
+		for(var j = 0; j<4; j++){ //looping through column sets of 4
+			win = true;
+			for(var k =j; k<j+4;k++){ //looping through each column in set o 4
+				if(grid[i][k]!=turn){win=false; break;}
+			}
+			if(win){return win;}
+		}
+	}
+
+
+	//checking each vertical column
+	for(var i = 0; i<7; i++){ //looping through columns
+		for(var j = 0; j<4; j++){ //looping through row sets of 4
+			win = true;
+			for(var k =j; k<j+4;k++){ //looping through each row in the set of 4
+				if(grid[k][i]!=turn){win=false; break;}
+			}
+			if(win){return win;}
+		}
+	}
+
+	return false;
 
 }
 
@@ -110,12 +132,12 @@ canvas.addEventListener("click", (event)=>{
 	let rowNum = addCircleToColumn(columnNum);
 	if(rowNum!=-1){
 		drawCircleInColumn(rowNum, columnNum);
+		console.log(verifyWin(rowNum, columnNum));
 		if(turn==="red"){
 			turn="green";
 		}else{turn="red";}
 		clearTopRow();
 		showCircleAboveGrid(columnNum*70+35);
-		verifyWin(rowNum, columnNum);
 	}
 	
 
