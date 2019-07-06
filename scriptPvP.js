@@ -4,6 +4,7 @@ const canvas = document.querySelector("#board");
 const ctx = canvas.getContext("2d");
 const gridSize = 70;
 let turn = "red";
+let playAgain = true;
 let grid = [[0, 0, 0, 0, 0, 0, 0], 
 			[0, 0, 0, 0, 0, 0, 0], 
 			[0, 0, 0, 0, 0, 0, 0], 
@@ -99,6 +100,7 @@ function drawWin(rowEnd, columnEnd, direction){
 	}
 	ctx.stroke();
 	ctx.closePath();
+
 }
 
 //draws the circle on the board at the specified position
@@ -226,12 +228,40 @@ window.addEventListener("load", ()=>{
 });
 
 window.addEventListener("mousemove", (event)=>{
-	let x = getMouseXCoorRelativeToCanvas(event);
-	showCircleAboveGrid(x);
+	 
+	 if (playAgain) {
+	 	let x = getMouseXCoorRelativeToCanvas(event);
+		showCircleAboveGrid(x);
+	 }
+ 
 });
 
 //handles clicking
 canvas.addEventListener("click", (event)=>{
+	if(playAgain){
+		main(event);
+	} 	
+});
+
+function win(){
+	playAgain = false;
+	if(confirm(`Player ${turn} won! Press Ok to play again or cancel to!`)){
+		grid = [[0, 0, 0, 0, 0, 0, 0], 
+			[0, 0, 0, 0, 0, 0, 0], 
+			[0, 0, 0, 0, 0, 0, 0], 
+			[0, 0, 0, 0, 0, 0, 0], 
+			[0, 0, 0, 0, 0, 0, 0], 
+			[0, 0, 0, 0, 0, 0, 0], 
+			[0, 0, 0, 0, 0, 0, 0]];
+		ctx.clearRect(0, 0, canvas.width, canvas.height);
+		drawGrid();
+		playAgain=true;
+	} else{
+		window.location.href = "start.html";
+	}
+}
+
+function main(event){
 	let columnNum = getColumn(getMouseXCoorRelativeToCanvas(event)).column;
 	if(isValidColumn(columnNum).valid){
 		let rowNum = isValidColumn(columnNum).row;
@@ -240,6 +270,8 @@ canvas.addEventListener("click", (event)=>{
 		if(verifyWin(rowNum, columnNum).win){
 			let winObj = verifyWin(rowNum, columnNum);
 			drawWin(winObj.row, winObj.column, winObj.direction)
+			setTimeout(win, 1);
+			
 		} else{
 			if(turn==="red"){
 				turn="green";
@@ -248,7 +280,7 @@ canvas.addEventListener("click", (event)=>{
 			showCircleAboveGrid(getCenterCoords(rowNum, columnNum).x);
 		}
 	}
-});
+}
 
 
 
