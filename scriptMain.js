@@ -129,7 +129,7 @@ function showCircleAboveGrid(x){
 
 
 //will verify if column is full or not
-function isValidColumn(columnNum){
+function isValidColumn(columnNum, grid){
 	for(var i = 6; i>=0; i--){
 		if(grid[i][columnNum]===0){
 			return {valid: true, row: i};
@@ -139,33 +139,34 @@ function isValidColumn(columnNum){
 }
 
 //will update the grid array 
-function addCircleToColumn(columnNum){
+function addCircleToColumn(columnNum, player, grid){
 	for(var i = 6; i>=0; i--){
 		if(grid[i][columnNum]===0){
-			grid[i][columnNum]=turn;
+			grid[i][columnNum]=player;
 			break;
 		}
 	}
 }
 
 //takes a row and column and checks to direction as specified by dir (if 1, then bottom right, if -1 then bottom left)
-function verifyDiagonal(rowStart, columnStart, direction){
+function verifyDiagonal(rowStart, columnStart, direction, player){
 	let row = rowStart;
 	let column = columnStart;
 	for(var i = 0; i<4; i++){
-		if(grid[row][column]!=turn){
+		if(grid[row][column]!=player){
 			return false;
 		}else{row+=1; column+=(1*direction)}
 	}
 	return true;
 }
 
+//player is whose turn to check a win for
 //return an object with following data
 //win - boolean to represent if won
 //column - column from which last check was made
 //row - row from which last check was made
 //direction - the type of check (1 - horizontal right, 2 - vertical down, 3 - diagonal bottom left, 4 - diagonal bottom right)
-function verifyWin(){
+function verifyWin(player, grid){
 
 	let win = true;
 
@@ -174,7 +175,7 @@ function verifyWin(){
 		for(var j = 0; j<4; j++){ //looping through column sets of 4
 			win = true;
 			for(var k =j; k<j+4;k++){ //looping through each column in set o 4
-				if(grid[i][k]!=turn){win=false; break;}
+				if(grid[i][k]!=player){win=false; break;}
 			}
 			if(win){return {win: win, column: k-4, row: i, direction: 1};}
 		}
@@ -186,7 +187,7 @@ function verifyWin(){
 		for(var j = 0; j<4; j++){ //looping through row sets of 4
 			win = true;
 			for(var k =j; k<j+4;k++){ //looping through each row in the set of 4
-				if(grid[k][i]!=turn){win=false; break;}
+				if(grid[k][i]!=player){win=false; break;}
 			}
 			if(win){
 				return {win: win, column: i, row: k-4, direction: 2};}
@@ -196,7 +197,7 @@ function verifyWin(){
 	//checking all diagonals to bottom left
 	for(var i = 3; i<7; i++){
 		for(var j = 0; j<4; j++){
-			win = verifyDiagonal(j, i, -1);
+			win = verifyDiagonal(j, i, -1, player);
 			if(win){
 				return {win: win, column: i, row: j, direction: 3};}
 		}
@@ -205,7 +206,7 @@ function verifyWin(){
 	//checking all diagonals to bottom right
 	for(var i = 0; i<4; i++){
 		for(var j = 0; j<4; j++){
-			win = verifyDiagonal(j, i, 1);
+			win = verifyDiagonal(j, i, 1, player);
 			if(win){return {win: win, column: i, row: j, direction: 4};}
 		}
 	}

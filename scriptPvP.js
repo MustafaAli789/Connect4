@@ -8,12 +8,12 @@ canvas.addEventListener("click", (event)=>{
 
 function main(event){
 	let columnNum = getColumn(getMouseXCoorRelativeToCanvas(event)).column;
-	if(isValidColumn(columnNum).valid){
-		let rowNum = isValidColumn(columnNum).row;
-		addCircleToColumn(columnNum); 
+	if(isValidColumn(columnNum, grid).valid){
+		let rowNum = isValidColumn(columnNum, grid).row;
+		addCircleToColumn(columnNum, turn, grid); 
 		drawCircleInColumn(rowNum, columnNum);
-		if(verifyWin(rowNum, columnNum).win){
-			let winObj = verifyWin(rowNum, columnNum);
+		if(verifyWin(turn, grid).win){
+			let winObj = verifyWin(turn, grid);
 			drawWin(winObj.row, winObj.column, winObj.direction)
 			setTimeout(win, 1);
 			
