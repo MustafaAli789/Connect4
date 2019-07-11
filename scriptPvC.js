@@ -39,11 +39,12 @@ function getOpponent(player){
 
 function getPlayerScore(player){
 
+	let enemy = getOpponent(player);
+
+
 	//The code below will check all horizontal group of 4 and for each
 	//a score is taken based on how many of the players pieces are in it
 	//assuming no opposing player pieces
-
-	let enemy = getOpponent(player);
 
 	let hGroupingsScore = 0;
 	let currHGroupingScore = 0;
