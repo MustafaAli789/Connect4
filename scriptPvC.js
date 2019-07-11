@@ -19,15 +19,6 @@ function getGridCopy(){
 	return gridCopy;
 }
 
-function placePlayer(level, grid){
-	
-}
-
-function getStaticEvaluation(player1, player2){
-	return getPlayerScore(player1)-getPlayerScore(player2);
-}
-
-
 function getOpponent(player){
 	if (player==="red"){
 		return "green";
@@ -37,84 +28,102 @@ function getOpponent(player){
 	}
 }
 
-function getPlayerScore(player){
+function staticEvaluation(){
 
-	let enemy = getOpponent(player);
+	//each block of code below loops through a certain set of 4 tiles (horizontal, vertical
+	//btm left diagonal, btm right diagonal). If in that group of 4 only one type of piece exists
+	//(only red or only green) then it counts how many of that piece and uses that to calculate
+	//score to add to appropriate players total score
+	//At the end, scores are subtracted, the more positive the better for red and vice versa
 
-
-	//The code below will check all horizontal group of 4 and for each
-	//a score is taken based on how many of the players pieces are in it
-	//assuming no opposing player pieces
-
-	let hGroupingsScore = 0;
+	let hGroupingsScoreRed = 0;
+	let hGroupingsScoreGreen = 0;
 	let currHGroupingScore = 0;
+
+	let vGroupingsScoreRed = 0;
+	let vGroupingsScoreGreen = 0;
+	let currVGroupingScore = 0;
+
+	let diagonalBtmLeftScoreRed = 0;
+	let diagonalBtmLeftScoreGreen = 0;
+	let currDiagonalBtmLeftScore = 0;
+
+	let diagonalBtmRightScoreRed = 0;
+	let diagonalBtmRightScoreGreen = 0;
+	let currDiagonalBtmRightScore = 0;
+
+	let assumedPlayerInGrouping = null;
 
 	//checking each horizontal row
 	for(var i = 0; i<7; i++){ //looping through rows
 		for(var j = 0; j<4; j++){ //looping through column sets of 4
-			currHGroupingScore = 0;
 			for(var k =j; k<j+4;k++){ //looping through each column in set o 4
-				if(grid[i][k]===enemy){currHGroupingScore = 0; break;}
-				else if(grid[i][k]===player){currHGroupingScore+=1;}
+				if(assumedPlayerInGrouping===null && grid[i][k]==="red"){assumedPlayerInGrouping="red";}
+				else if(assumedPlayerInGrouping===null && grid[i][k]==="green"){assumedPlayerInGrouping="green";}
+				if(grid[i][k]===getOpponent(assumedPlayerInGrouping)){currHGroupingScore = 0; break;}
+				else if(grid[i][k]===assumedPlayerInGrouping){currHGroupingScore+=1;}
 			}
-			hGroupingsScore+=currHGroupingScore**2; 
+			if(assumedPlayerInGrouping==="red"){hGroupingsScoreRed+=currHGroupingScore**2;}
+			else if(assumedPlayerInGrouping==="green"){hGroupingsScoreGreen+=currHGroupingScore**2;}
+			currHGroupingScore = 0;
+			assumedPlayerInGrouping = null;
 		}
 	}
-
-	//The code below will check all vertical group of 4 and for each
-	//a score is taken based on how many of the players pieces are in it
-	//assuming no opposing player pieces
-
-	let vGroupingsScore = 0;
-	let currVGroupingScore = 0;
 
 	//checking each vertical column
 	for(var i = 0; i<7; i++){ //looping through columns
 		for(var j = 0; j<4; j++){ //looping through row sets of 4
 			currVGroupingScore = 0;
 			for(var k =j; k<j+4;k++){ //looping through each row in the set of 4
-				if(grid[k][i]===enemy){currVGroupingScore = 0; break;}
-				else if(grid[k][i]===player){currVGroupingScore+=1;}
+				if(assumedPlayerInGrouping===null && grid[k][i]==="red"){assumedPlayerInGrouping="red";}
+				else if(assumedPlayerInGrouping===null && grid[k][i]==="green"){assumedPlayerInGrouping="green";}
+				if(grid[k][i]===getOpponent(assumedPlayerInGrouping)){currVGroupingScore = 0; break;}
+				else if(grid[k][i]===assumedPlayerInGrouping){currVGroupingScore+=1;}
 			}
-			vGroupingsScore+=currVGroupingScore**2;
+			if(assumedPlayerInGrouping==="red"){vGroupingsScoreRed+=currVGroupingScore**2;}
+			else if(assumedPlayerInGrouping==="green"){vGroupingsScoreGreen+=currVGroupingScore**2;}
+			currVGroupingScore = 0;
+			assumedPlayerInGrouping = null;
 		}
 	}
-
-	//The code below goes through all diagonal bottom left groupings and 
-	//checks to see how many player pieces are in it and gives a score based on that
-	//assuming no opponent players
-
-	let diagonalBtmLeftScore = 0;
-	let currDiagonalBtmLeftScore = 0;
 
 	//checking all diagonals to bottom left
 	for(var i = 3; i<7; i++){ //looping over columns from where to start diagonal search
 		for(var j = 0; j<4; j++){ //looping over rows from where to start diagonal search
 			for(var k =0; k<4; k++){
-				if(grid[j+k][i-k]===enemy){currDiagonalBtmLeftScore=0; break;}
-				else if(grid[j+k][i-k]===player){currDiagonalBtmLeftScore+=1;}
+				if(assumedPlayerInGrouping===null && grid[j+k][i-k]==="red"){assumedPlayerInGrouping="red";}
+				else if(assumedPlayerInGrouping===null && grid[j+k][i-k]==="green"){assumedPlayerInGrouping="green";}
+				if(grid[j+k][i-k]===getOpponent(assumedPlayerInGrouping)){currDiagonalBtmLeftScore=0; break;}
+				else if(grid[j+k][i-k]===assumedPlayerInGrouping){currDiagonalBtmLeftScore+=1;}
 			}
-			diagonalBtmLeftScore+=currDiagonalBtmLeftScore**2;
+			if(assumedPlayerInGrouping==="red"){diagonalBtmLeftScoreRed+=currDiagonalBtmLeftScore**2;}
+			else if(assumedPlayerInGrouping==="green"){diagonalBtmLeftScoreGreen+=currDiagonalBtmLeftScore**2;}
 			currDiagonalBtmLeftScore=0;
+			assumedPlayerInGrouping = null;
 		}
 	}
-
-	let diagonalBtmRightScore = 0;
-	let currDiagonalBtmRightScore = 0;
 
 	//checking all diagonals to bottom right
 	for(var i = 0; i<4; i++){ //looping over columns from where to start diagonal search
 		for(var j = 0; j<4; j++){ //looping over rows from where to start diagonal search
 			for(var k =0; k<4; k++){
-				if(grid[j+k][i+k]===enemy){currDiagonalBtmRightScore=0; break;}
-				else if(grid[j+k][i+k]===player){currDiagonalBtmRightScore+=1;}
+				if(assumedPlayerInGrouping===null && grid[j+k][i+k]==="red"){assumedPlayerInGrouping="red";}
+				else if(assumedPlayerInGrouping===null && grid[j+k][i+k]==="green"){assumedPlayerInGrouping="green";}
+				if(grid[j+k][i+k]===getOpponent(assumedPlayerInGrouping)){currDiagonalBtmRightScore=0; break;}
+				else if(grid[j+k][i+k]===assumedPlayerInGrouping){currDiagonalBtmRightScore+=1;}
 			}
-			diagonalBtmRightScore+=currDiagonalBtmRightScore**2;
+			if(assumedPlayerInGrouping==="red"){diagonalBtmRightScoreRed+=currDiagonalBtmRightScore**2;}
+			else if(assumedPlayerInGrouping==="green"){diagonalBtmRightScoreGreen+=currDiagonalBtmRightScore**2;}
 			currDiagonalBtmRightScore=0;
+			assumedPlayerInGrouping=null;
 		}
 	}
 
-	return diagonalBtmRightScore + diagonalBtmLeftScore + hGroupingsScore + vGroupingsScore;
+	let redScore = diagonalBtmRightScoreRed + diagonalBtmLeftScoreRed + hGroupingsScoreRed + vGroupingsScoreRed;
+	let greenScore = diagonalBtmRightScoreGreen + diagonalBtmLeftScoreGreen + hGroupingsScoreGreen + vGroupingsScoreGreen;
+
+
+	return redScore-greenScore;
 
 }
 
