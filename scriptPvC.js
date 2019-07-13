@@ -9,24 +9,13 @@ function getGridCopy(gridParam){
 			[0, 0, 0, 0, 0, 0, 0], 
 			[0, 0, 0, 0, 0, 0, 0], 
 			[0, 0, 0, 0, 0, 0, 0], 
-			[0, 0, 0, 0, 0, 0, 0], 
 			[0, 0, 0, 0, 0, 0, 0]];
-	for(var i =0; i<7; i++){
+	for(var i =0; i<6; i++){
 		for(var j =0; j<7; j++){
 			gridCopy[i][j]=gridParam[i][j];
 		}
 	}
 	return gridCopy;
-}
-
-function getIndex(maxEval, curEval, i){
-	if(curEval>maxEval){
-		return i;
-	} else if(maxEval.value>curEval.value){
-		return maxEval.index;
-	} else{
-		return i;
-	}
 }
 
 function minimax(depth, player, Grid, alpha, beta){
@@ -35,8 +24,6 @@ function minimax(depth, player, Grid, alpha, beta){
 
 	if(depth===0 || verifyWin(getOpponent(player), tempGrid)){
 		let score = staticEvaluation(tempGrid);
-		/*console.log(tempGrid);
-		console.log(player, score)*/
 		return {value: score, index: 0};
 	}
 
@@ -44,7 +31,7 @@ function minimax(depth, player, Grid, alpha, beta){
 		let bestColumn = 0;
 		let maxEval = {value:-Infinity, index: bestColumn};
 		for(var i =0; i<7; i++){
-			if(isValidColumn(i, tempGrid)){
+			if(isValidColumn(i, tempGrid).valid){
 				addCircleToColumn(i, "red", tempGrid);
 				let curEval = minimax(depth-1, "green", tempGrid, alpha, beta);
 				if(curEval.value>maxEval.value){bestColumn=i;}
@@ -61,7 +48,7 @@ function minimax(depth, player, Grid, alpha, beta){
 		let bestColumn = 0;
 		let minEval = {value: Infinity, index: bestColumn};
 		for(var i =0; i<7; i++){
-			if(isValidColumn(i, tempGrid)){
+			if(isValidColumn(i, tempGrid).valid){
 				addCircleToColumn(i, "green", tempGrid);
 				let curEval = minimax(depth-1, "red", tempGrid, alpha, beta);
 				if(curEval.value<minEval.value){bestColumn=i;}
@@ -115,7 +102,7 @@ function staticEvaluation(grid){
 	let assumedPlayerInGrouping = null;
 
 	//checking each horizontal row
-	for(var i = 0; i<7; i++){ //looping through rows
+	for(var i = 0; i<6; i++){ //looping through rows
 		for(var j = 0; j<4; j++){ //looping through column sets of 4
 			for(var k =j; k<j+4;k++){ //looping through each column in set o 4
 				if(assumedPlayerInGrouping===null && grid[i][k]==="red"){assumedPlayerInGrouping="red";}
@@ -133,7 +120,7 @@ function staticEvaluation(grid){
 
 	//checking each vertical column
 	for(var i = 0; i<7; i++){ //looping through columns
-		for(var j = 0; j<4; j++){ //looping through row sets of 4
+		for(var j = 0; j<3; j++){ //looping through row sets of 3
 			currVGroupingScore = 0;
 			for(var k =j; k<j+4;k++){ //looping through each row in the set of 4
 				if(assumedPlayerInGrouping===null && grid[k][i]==="red"){assumedPlayerInGrouping="red";}
@@ -151,7 +138,7 @@ function staticEvaluation(grid){
 
 	//checking all diagonals to bottom left
 	for(var i = 3; i<7; i++){ //looping over columns from where to start diagonal search
-		for(var j = 0; j<4; j++){ //looping over rows from where to start diagonal search
+		for(var j = 0; j<3; j++){ //looping over rows from where to start diagonal search
 			for(var k =0; k<4; k++){
 				if(assumedPlayerInGrouping===null && grid[j+k][i-k]==="red"){assumedPlayerInGrouping="red";}
 				else if(assumedPlayerInGrouping===null && grid[j+k][i-k]==="green"){assumedPlayerInGrouping="green";}
@@ -168,7 +155,7 @@ function staticEvaluation(grid){
 
 	//checking all diagonals to bottom right
 	for(var i = 0; i<4; i++){ //looping over columns from where to start diagonal search
-		for(var j = 0; j<4; j++){ //looping over rows from where to start diagonal search
+		for(var j = 0; j<3; j++){ //looping over rows from where to start diagonal search
 			for(var k =0; k<4; k++){
 				if(assumedPlayerInGrouping===null && grid[j+k][i+k]==="red"){assumedPlayerInGrouping="red";}
 				else if(assumedPlayerInGrouping===null && grid[j+k][i+k]==="green"){assumedPlayerInGrouping="green";}
@@ -204,7 +191,7 @@ canvas.addEventListener("click", (event)=>{
 
 function main(){
 	if(playAgain && turn==="green"){
-		let aiColumn = minimax(8, "green", getGridCopy(gridMain), -Infinity, Infinity).index;
+		let aiColumn = minimax(9, "green", getGridCopy(gridMain), -Infinity, Infinity).index;
 		let rowNum = isValidColumn(aiColumn, gridMain).row;
 		addCircleToColumn(aiColumn, turn, gridMain); 
 		drawCircleInColumn(rowNum, aiColumn);
@@ -227,7 +214,6 @@ function postMoveActions(rowNum, columnNum){
 		let winObj = verifyWin(turn, gridMain);
 		drawWin(winObj.row, winObj.column, winObj.direction)
 		setTimeout(win, 1);
-			
 	} else{
 		if(turn==="red"){
 			turn="green";

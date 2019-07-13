@@ -15,7 +15,7 @@ function main(event){
 		if(verifyWin(turn, gridMain).win){
 			let winObj = verifyWin(turn, gridMain);
 			drawWin(winObj.row, winObj.column, winObj.direction)
-			setTimeout(win, 1);
+			setTimeout(win, 1.5);
 			
 		} else{
 			if(turn==="red"){

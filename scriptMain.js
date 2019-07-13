@@ -10,7 +10,6 @@ let gridMain = [[0, 0, 0, 0, 0, 0, 0],
 			[0, 0, 0, 0, 0, 0, 0], 
 			[0, 0, 0, 0, 0, 0, 0], 
 			[0, 0, 0, 0, 0, 0, 0], 
-			[0, 0, 0, 0, 0, 0, 0], 
 			[0, 0, 0, 0, 0, 0, 0]];
 
 
@@ -57,7 +56,7 @@ function getCenterCoords(rowNum, columnNum){
 
 //--------------------------------------Drawing Related Methods START----------------------------//
 function drawGrid(){
-	for(var i =0; i<7; i++){
+	for(var i =0; i<6; i++){
 		for(var j = 0; j<7; j++){
 			ctx.strokeRect(j*gridSize, i*gridSize+40, gridSize, gridSize);
 		}
@@ -128,9 +127,9 @@ function showCircleAboveGrid(x){
 //-----------------------------------Logic and Funcional Methods START------------------------//
 
 
-//will verify if column is full or not
+//will verify if column is full or not and returns the bottom most empty row
 function isValidColumn(columnNum, grid){
-	for(var i = 6; i>=0; i--){
+	for(var i = 5; i>=0; i--){
 		if(grid[i][columnNum]===0){
 			return {valid: true, row: i};
 		}
@@ -140,7 +139,7 @@ function isValidColumn(columnNum, grid){
 
 //will update the grid array 
 function addCircleToColumn(columnNum, player, grid){
-	for(var i = 6; i>=0; i--){
+	for(var i = 5; i>=0; i--){
 		if(grid[i][columnNum]===0){
 			grid[i][columnNum]=player;
 			break;
@@ -150,7 +149,7 @@ function addCircleToColumn(columnNum, player, grid){
 
 //removes last circle that was added
 function removeCircleFromColumn(columnNum, grid){
-	for(var i  = 0; i<7; i++){
+	for(var i  = 0; i<6; i++){
 		if(grid[i][columnNum]==="red"||grid[i][columnNum]==="green"){
 			grid[i][columnNum]= 0;
 			break;
@@ -181,7 +180,7 @@ function verifyWin(player, grid){
 	let win = true;
 
 	//checking each horizontal row
-	for(var i = 0; i<7; i++){ //looping through rows
+	for(var i = 0; i<6; i++){ //looping through rows
 		for(var j = 0; j<4; j++){ //looping through column sets of 4
 			win = true;
 			for(var k =j; k<j+4;k++){ //looping through each column in set o 4
@@ -194,7 +193,7 @@ function verifyWin(player, grid){
 
 	//checking each vertical column
 	for(var i = 0; i<7; i++){ //looping through columns
-		for(var j = 0; j<4; j++){ //looping through row sets of 4
+		for(var j = 0; j<3; j++){ //looping through row sets of 4
 			win = true;
 			for(var k =j; k<j+4;k++){ //looping through each row in the set of 4
 				if(grid[k][i]!=player){win=false; break;}
@@ -206,7 +205,7 @@ function verifyWin(player, grid){
 
 	//checking all diagonals to bottom left
 	for(var i = 3; i<7; i++){
-		for(var j = 0; j<4; j++){
+		for(var j = 0; j<3; j++){
 			win = verifyDiagonal(j, i, -1, player, grid);
 			if(win){
 				return {win: win, column: i, row: j, direction: 3};}
@@ -215,7 +214,7 @@ function verifyWin(player, grid){
 
 	//checking all diagonals to bottom right
 	for(var i = 0; i<4; i++){
-		for(var j = 0; j<4; j++){
+		for(var j = 0; j<3; j++){
 			win = verifyDiagonal(j, i, 1, player, grid);
 			if(win){return {win: win, column: i, row: j, direction: 4};}
 		}
@@ -233,7 +232,7 @@ function verifyWin(player, grid){
 
 window.addEventListener("load", ()=>{
 	canvas.width = 490;
-	canvas.height = 530;
+	canvas.height = 460;
 	ctx.setLineDash([5, 3]);
 	drawGrid();
 });
