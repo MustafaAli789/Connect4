@@ -5,7 +5,7 @@ const ctx = canvas.getContext("2d");
 const gridSize = 70;
 let turn = "red";
 let playAgain = true;
-let grid = [[0, 0, 0, 0, 0, 0, 0], 
+let gridMain = [[0, 0, 0, 0, 0, 0, 0], 
 			[0, 0, 0, 0, 0, 0, 0], 
 			[0, 0, 0, 0, 0, 0, 0], 
 			[0, 0, 0, 0, 0, 0, 0], 
@@ -148,8 +148,18 @@ function addCircleToColumn(columnNum, player, grid){
 	}
 }
 
+//removes last circle that was added
+function removeCircleFromColumn(columnNum, grid){
+	for(var i  = 0; i<7; i++){
+		if(grid[i][columnNum]==="red"||grid[i][columnNum]==="green"){
+			grid[i][columnNum]= 0;
+			break;
+		}
+	}
+}
+
 //takes a row and column and checks to direction as specified by dir (if 1, then bottom right, if -1 then bottom left)
-function verifyDiagonal(rowStart, columnStart, direction, player){
+function verifyDiagonal(rowStart, columnStart, direction, player, grid){
 	let row = rowStart;
 	let column = columnStart;
 	for(var i = 0; i<4; i++){
@@ -197,7 +207,7 @@ function verifyWin(player, grid){
 	//checking all diagonals to bottom left
 	for(var i = 3; i<7; i++){
 		for(var j = 0; j<4; j++){
-			win = verifyDiagonal(j, i, -1, player);
+			win = verifyDiagonal(j, i, -1, player, grid);
 			if(win){
 				return {win: win, column: i, row: j, direction: 3};}
 		}
@@ -206,7 +216,7 @@ function verifyWin(player, grid){
 	//checking all diagonals to bottom right
 	for(var i = 0; i<4; i++){
 		for(var j = 0; j<4; j++){
-			win = verifyDiagonal(j, i, 1, player);
+			win = verifyDiagonal(j, i, 1, player, grid);
 			if(win){return {win: win, column: i, row: j, direction: 4};}
 		}
 	}
@@ -240,7 +250,7 @@ window.addEventListener("mousemove", (event)=>{
 function win(){
 	playAgain = false;
 	if(confirm(`Player ${turn} won! Press Ok to play again or cancel to!`)){
-		grid = [[0, 0, 0, 0, 0, 0, 0], 
+		gridMain = [[0, 0, 0, 0, 0, 0, 0], 
 			[0, 0, 0, 0, 0, 0, 0], 
 			[0, 0, 0, 0, 0, 0, 0], 
 			[0, 0, 0, 0, 0, 0, 0], 
